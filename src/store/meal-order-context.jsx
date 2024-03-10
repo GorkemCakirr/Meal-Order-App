@@ -1,64 +1,69 @@
-// import {useReducer} from "react";
+import {createContext, useReducer} from "react";
+const INITIAL_STATE = {
+  selected
+}
 
-// export const INITIAL_STATE = {
-//   selectedMeals: [],
-//   totalPrice: [],
-//   isCartOpen: false,
-// };
+function mealOrderReducer(state, action) {
+  switch (action.type) {
+    case "ADD_MEAL":
+      state.selectedMeals.push(action.payload);
+      return {
+        ...state,
+      };
 
-// export default function mealOrderReducer(state, action) {
-//   switch (action.type) {
-//     case "ADD_MEAL":
-//       state.selectedMeals.push(action.payload);
-//       return {
-//         ...state,
-//       };
+    case "ERROR":
+      return {
+        ...state,
+      };
 
-//     case "ERROR":
-//       return {
-//         ...state,
-//       };
+    case "TOTAL_PRİCE":
+      return {
+        ...state,
+        totalPrice: action.payload,
+      };
 
-//     case "TOTAL_PRİCE":
-//       return {
-//         ...state,
-//         totalPrice: action.payload,
-//       };
+    case "OPEN_CART":
+      return {
+        ...state,
+        isCartOpen: true,
+      };
 
-//     case "OPEN_CART":
-//       return {
-//         ...state,
-//         isCartOpen: true,
-//       };
+    case "CLOSE_CART":
+      return {
+        ...state,
+        isCartOpen: false,
+      };
 
-//     case "CLOSE_CART":
-//       return {
-//         ...state,
-//         isCartOpen: false,
-//       };
+    case "INCREMENT":
+      let counterInc = state.selectedMeals[action.payload].count;
+      counterInc += 1;
 
-//     case "INCREMENT":
-//       let counterInc = state.selectedMeals[action.payload].count;
-//       counterInc += 1;
+      return {
+        ...state,
+        selectedMeals,
+      };
 
-//       return {
-//         ...state,
-//         selectedMeals,
-//       };
+    case "DECREMENT":
+      let counterDec = state.selectedMeals[action.payload].count;
+      counterDec -= 1;
+      return {
+        ...state,
+        selectedMeals,
+      };
+    case "DELETE_MEAL":
+      state.selectedMeals.splice(action.payload, 1);
 
-//     case "DECREMENT":
-//       let counterDec = state.selectedMeals[action.payload].count;
-//       counterDec -= 1;
-//       return {
-//         ...state,
-//         selectedMeals,
-//       };
-//     case "DELETE_MEAL":
-//       state.selectedMeals.splice(action.payload, 1);
+      return {
+        ...state,
+        selectedMeals,
+      };
+  }
+}
 
-//       return {
-//         ...state,
-//         selectedMeals,
-//       };
-//   }
-// }
+export const MealContext = createContext({
+  
+})
+
+export default function CartContextProvider({children}){
+
+}

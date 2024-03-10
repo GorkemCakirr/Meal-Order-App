@@ -3,7 +3,7 @@ import Meals from "./components/Meals";
 import {useState, useReducer, useEffect} from "react";
 import Modal from "./components/Modal";
 import {updateOrder} from "./https";
-import {INITIAL_STATE} from "./store/meal-order-reducer";
+import {INITIAL_STATE} from "./store/meal-order-context";
 
 function mealOrderReducer(state, action) {
   switch (action.type) {
@@ -77,7 +77,7 @@ function App() {
 
     //   return [meal, ...prevSelectedMeals];
     // });
-    console.log(state.selectedMeals);
+
     dispatch({
       type: "ADD_MEAL",
       payload: meal,

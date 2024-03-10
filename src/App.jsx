@@ -5,6 +5,8 @@ import Modal from "./components/Modal";
 import {updateOrder} from "./https";
 
 function App() {
+
+  
   const [selectedMeals, setSelectedMeals] = useState([]);
   const [totalPrice, setTotalPrice] = useState([]);
 
@@ -60,14 +62,14 @@ function App() {
   function incrementMeal(index) {
     console.log(selectedMeals[index].count);
     setSelectedMeals((prevSelectedMeals) => {
-      selectedMeals[index].count = selectedMeals[index].count + 0.5;
+      selectedMeals[index].count = selectedMeals[index].count + 1;
       return [...prevSelectedMeals];
     });
   }
   function decrementMeal(index) {
     if (selectedMeals[index].count > 1) {
       setSelectedMeals((prevSelectedMeals) => {
-        selectedMeals[index].count = selectedMeals[index].count - 0.5;
+        selectedMeals[index].count = selectedMeals[index].count - 1;
         return [...prevSelectedMeals];
       });
     } else {

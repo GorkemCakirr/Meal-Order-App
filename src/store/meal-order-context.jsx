@@ -1,7 +1,5 @@
 import {createContext, useReducer} from "react";
-const INITIAL_STATE = {
-  selected
-}
+export const INITIAL_STATE = {};
 
 function mealOrderReducer(state, action) {
   switch (action.type) {
@@ -48,7 +46,6 @@ function mealOrderReducer(state, action) {
       counterDec -= 1;
       return {
         ...state,
-        selectedMeals,
       };
     case "DELETE_MEAL":
       state.selectedMeals.splice(action.payload, 1);
@@ -61,9 +58,15 @@ function mealOrderReducer(state, action) {
 }
 
 export const MealContext = createContext({
-  
-})
+  selectedMeals: [],
+  isCartOpen: false,
+  totalPrice: [],
+});
 
-export default function CartContextProvider({children}){
-
+export default function mEALContextProvider({children}) {
+  const [state, dispatch] = useReducer(mealOrderReducer, {
+    selectedMeals: [],
+    isCartOpen: false,
+    totalPrice: [],
+  });
 }

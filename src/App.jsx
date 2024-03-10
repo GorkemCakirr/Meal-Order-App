@@ -5,12 +5,20 @@ import Modal from "./components/Modal";
 import {updateOrder} from "./https";
 import {INITIAL_STATE} from "./store/meal-order-context";
 
+// export const INITIAL_STATE = {
+//   selectedMeals: [],
+//   isCartOpen: false,
+//   totalPrice: [],
+// };
+
 function mealOrderReducer(state, action) {
   switch (action.type) {
     case "ADD_MEAL":
-      state.selectedMeals.push(action.payload);
+      const addedMeal = state.selectedMeals;
+      addedMeal.push(action.payload);
       return {
         ...state,
+        selectedMeals: addedMeal,
       };
 
     case "ERROR":
@@ -25,10 +33,18 @@ function mealOrderReducer(state, action) {
       };
 
     case "OPEN_CART":
-      return {
-        ...state,
-        isCartOpen: true,
-      };
+      debugger;
+      if (state.selectedMeals.length === 0) {
+        return {
+          ...state,
+          isCartOpen: false,
+        };
+      } else {
+        return {
+          ...state,
+          isCartOpen: true,
+        };
+      }
 
     case "CLOSE_CART":
       return {
@@ -37,12 +53,11 @@ function mealOrderReducer(state, action) {
       };
 
     case "INCREMENT":
-      let counterInc = state.selectedMeals[action.payload].count;
-      counterInc += 1;
+      let counterInc = state.selectedMeals;
+      counterInc[action.payload].count += 1;
 
       return {
         ...state,
-        selectedMeals,
       };
 
     case "DECREMENT":
@@ -50,14 +65,16 @@ function mealOrderReducer(state, action) {
       counterDec -= 1;
       return {
         ...state,
-        selectedMeals,
+        selectedMeals: counterDec,
       };
     case "DELETE_MEAL":
-      state.selectedMeals.splice(action.payload, 1);
+      const deleteMeal = state.selectedMeals;
+      // state.selectedMeals.splice(action.payload, 1);
+      deleteMeal.splice(action.payload, 1);
 
       return {
         ...state,
-        selectedMeals,
+        selectedMeals: deleteMeal,
       };
   }
 }
@@ -154,14 +171,16 @@ function App() {
       });
     }
   }
-  console.log(state.selectedMeals);
+
   const selectedOrder = state.selectedMeals;
+
   const order = selectedOrder.map((meal) => {
     let index = selectedOrder.indexOf(meal);
     let count = selectedOrder[index].count;
+    console.log(meal.id);
 
     return (
-      <li className="cart-item" key={meal.id}>
+      <li className="cart-item" key={index}>
         <p>
           {meal.name} {count} x {meal.price}
         </p>
@@ -173,19 +192,26 @@ function App() {
       </li>
     );
   });
-
+  let length = state.selectedMeals.length;
+  console.log(length);
   return (
     <>
-      <Modal className="cart-total" open={state.isCartOpen} onClose={closeCart}>
-        <div>
-          <h3>Your Cart</h3>
-          {order}
-          <p className="cart-item">${state.totalPrice}</p>
-          <button onClick={closeCart} className="button">
-            Close
-          </button>
-        </div>
-      </Modal>
+      {length ? (
+        <Modal
+          className="cart-total"
+          open={state.isCartOpen}
+          onClose={closeCart}
+        >
+          <div>
+            <h3>Your Cart</h3>
+            {order}
+            <p className="cart-item">${state.totalPrice}</p>
+            <button onClick={closeCart} className="button">
+              Close
+            </button>
+          </div>
+        </Modal>
+      ) : null}
 
       <div id="main-header">
         <Header />

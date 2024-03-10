@@ -1,10 +1,14 @@
 import {useEffect, useState} from "react";
 import {fetchMeals} from "../https";
 import Error from "./Error";
+import {useContext} from "react";
+import {MealContext} from "../store/meal-order-context";
 
-export default function Meals({addMealToCart}) {
+export default function Meals() {
   const [meals, setMeals] = useState([]);
   const [error, setError] = useState();
+
+  const {addMealToCart} = useContext(MealContext);
 
   useEffect(() => {
     async function displayMeals() {

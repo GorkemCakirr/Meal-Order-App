@@ -1,41 +1,100 @@
 import Header from "./components/Header";
 import Meals from "./components/Meals";
-import {useState, useRef, useEffect} from "react";
+import {useState, useReducer, useEffect} from "react";
 import Modal from "./components/Modal";
 import {updateOrder} from "./https";
+import {INITIAL_STATE} from "./store/meal-order-reducer";
+
+function mealOrderReducer(state, action) {
+  switch (action.type) {
+    case "ADD_MEAL":
+      state.selectedMeals.push(action.payload);
+      return {
+        ...state,
+      };
+
+    case "ERROR":
+      return {
+        ...state,
+      };
+
+    case "TOTAL_PRİCE":
+      return {
+        ...state,
+        totalPrice: action.payload,
+      };
+
+    case "OPEN_CART":
+      return {
+        ...state,
+        isCartOpen: true,
+      };
+
+    case "CLOSE_CART":
+      return {
+        ...state,
+        isCartOpen: false,
+      };
+
+    case "INCREMENT":
+      let counterInc = state.selectedMeals[action.payload].count;
+      counterInc += 1;
+
+      return {
+        ...state,
+        selectedMeals,
+      };
+
+    case "DECREMENT":
+      let counterDec = state.selectedMeals[action.payload].count;
+      counterDec -= 1;
+      return {
+        ...state,
+        selectedMeals,
+      };
+    case "DELETE_MEAL":
+      state.selectedMeals.splice(action.payload, 1);
+
+      return {
+        ...state,
+        selectedMeals,
+      };
+  }
+}
 
 function App() {
+  const [state, dispatch] = useReducer(mealOrderReducer, INITIAL_STATE);
+  // const [selectedMeals, setSelectedMeals] = useState([]);
+  // const [totalPrice, setTotalPrice] = useState([]);
 
-  
-  const [selectedMeals, setSelectedMeals] = useState([]);
-  const [totalPrice, setTotalPrice] = useState([]);
-
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
+  // const [isCartOpen, setIsCartOpen] = useState(false);
 
   async function addMealToCart(meal) {
- 
-      setSelectedMeals((prevSelectedMeals) => {
-        if (prevSelectedMeals.some((food) => food.id === meal.id)) {
-          return prevSelectedMeals;
-        }
+    // setSelectedMeals((prevSelectedMeals) => {
+    //   if (prevSelectedMeals.some((food) => food.id === meal.id)) {
+    //     return prevSelectedMeals;
+    //   }
 
-        return [meal, ...prevSelectedMeals];
-      });
-      try {
+    //   return [meal, ...prevSelectedMeals];
+    // });
+    console.log(state.selectedMeals);
+    dispatch({
+      type: "ADD_MEAL",
+      payload: meal,
+    });
+    try {
       await updateOrder(meal);
     } catch (error) {
-      setErrorUpdatingMeals({
-        message: error.message || "Failed to update meals.",
+      dispatch({
+        type: "ERROR",
+        payload: error,
       });
-      setSelectedMeals(selectedMeals);
     }
   }
 
-
   useEffect(() => {
     function mealPrice() {
-      const price = selectedMeals.map((meal) => {
+      const price = state.selectedMeals.map((meal) => {
         let total = meal.price * meal.count;
         return total;
       });
@@ -44,45 +103,62 @@ function App() {
         lastPrice += item;
         return lastPrice;
       });
-      setTotalPrice(lastPrice.toFixed(2));
+      dispatch({
+        type: "TOTAL_PRİCE",
+        payload: lastPrice,
+      });
     }
 
     mealPrice();
-  }, [selectedMeals]);
-
-  console.log(totalPrice);
+  }, []);
 
   function openCart() {
-    setIsCartOpen(true);
+    dispatch({
+      type: "OPEN_CART",
+    });
   }
   function closeCart() {
-    setIsCartOpen(false);
+    dispatch({
+      type: "CLOSE_CART",
+    });
   }
 
   function incrementMeal(index) {
-    console.log(selectedMeals[index].count);
-    setSelectedMeals((prevSelectedMeals) => {
-      selectedMeals[index].count = selectedMeals[index].count + 1;
-      return [...prevSelectedMeals];
+    // setSelectedMeals((prevSelectedMeals) => {
+    //   selectedMeals[index].count = selectedMeals[index].count + 1;
+    //   return [...prevSelectedMeals];
+    // });
+    dispatch({
+      type: "INCREMENT",
+      payload: index,
     });
   }
   function decrementMeal(index) {
-    if (selectedMeals[index].count > 1) {
-      setSelectedMeals((prevSelectedMeals) => {
-        selectedMeals[index].count = selectedMeals[index].count - 1;
-        return [...prevSelectedMeals];
+    if (state.selectedMeals[index].count > 1) {
+      // setSelectedMeals((prevSelectedMeals) => {
+      //   selectedMeals[index].count = selectedMeals[index].count - 1;
+      //   return [...prevSelectedMeals];
+      // });
+      dispatch({
+        type: "DECREMENT",
+        payload: index,
       });
     } else {
-      setSelectedMeals((prevSelectedMeals) => {
-        selectedMeals.splice(index,1)
-        return [...prevSelectedMeals];
+      // setSelectedMeals((prevSelectedMeals) => {
+      //   selectedMeals.splice(index, 1);
+      //   return [...prevSelectedMeals];
+      // });
+      dispatch({
+        type: "DELETE_MEAL",
+        payload: index,
       });
     }
   }
-
-  const order = selectedMeals.map((meal) => {
-    let index = selectedMeals.indexOf(meal);
-    let count = selectedMeals[index].count;
+  console.log(state.selectedMeals);
+  const selectedOrder = state.selectedMeals;
+  const order = selectedOrder.map((meal) => {
+    let index = selectedOrder.indexOf(meal);
+    let count = selectedOrder[index].count;
 
     return (
       <li className="cart-item" key={meal.id}>
@@ -100,19 +176,21 @@ function App() {
 
   return (
     <>
-      <Modal className="cart-total" open={isCartOpen} onClose={closeCart}>
+      <Modal className="cart-total" open={state.isCartOpen} onClose={closeCart}>
         <div>
           <h3>Your Cart</h3>
           {order}
-          <p className="cart-item">${totalPrice}</p>
-          <button onClick={closeCart} className="button">Close</button>
+          <p className="cart-item">${state.totalPrice}</p>
+          <button onClick={closeCart} className="button">
+            Close
+          </button>
         </div>
       </Modal>
 
       <div id="main-header">
         <Header />
         <button onClick={openCart} className="button">
-          Cart ({selectedMeals.length})
+          Cart ({state.selectedMeals.length})
         </button>
       </div>
       <Meals addMealToCart={addMealToCart} />

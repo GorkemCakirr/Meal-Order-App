@@ -1,38 +1,27 @@
 import Header from "./Header";
 import Meals from "./Meals";
-
+import Form from "./Form";
 import Modal from "./Modal";
-import {useContext, useState,useEffect} from "react";
+import {useContext, useState} from "react";
 import {MealContext} from "../store/meal-order-context";
 
 export default function Control() {
-  const [totalPrice, setTotalPrice] = useState([]);
+  const [formIsFinished, setFormIsFinished] = useState(false);
+  function finishForm() {
+    setFormIsFinished(true);
+  }
 
-  const {selectedMeals, decrementMeal, incrementMeal, closeCart, openCart} =
-    useContext(MealContext);
-
-  //   case "TOTAL_PRİCE":
-  //     return {
-  //       ...state,
-  //       totalPrice: action.payload,
-  //     };
-  useEffect(() => {
-      function mealPrice() {
-        const price = selectedMeals.map((meal) => {
-          let total = meal.price * meal.count;
-          return total;
-        });
-        let lastPrice = 0;
-        price.map((item) => {
-          lastPrice += item;
-          return lastPrice;
-        });
-       setTotalPrice(lastPrice)
-      }
-
-      mealPrice();
-    }, [selectedMeals]);
-
+  const {
+    selectedMeals,
+    totalPrice,
+    isCheckoutOpen,
+    isCartOpen,
+    decrementMeal,
+    incrementMeal,
+    closeCart,
+    openCart,
+    handleCheckout,
+  } = useContext(MealContext);
 
   const order = selectedMeals.map((meal) => {
     let index = selectedMeals.indexOf(meal);
@@ -51,10 +40,37 @@ export default function Control() {
       </li>
     );
   });
-  let length = selectedMeals.length;
-  return (
-    <>
-      {length ? (
+
+  function handleCloseCart() {
+    closeCart();
+    setFormIsFinished(false);
+  }
+
+  let modal;
+
+  if (isCartOpen) {
+    if (isCheckoutOpen) {
+      modal = (
+        <Modal className="cart-total">
+          {formIsFinished ? (
+            <div>
+              <h3>Success!</h3>
+              <p>Your order was submitted succesfully.</p>
+              <p>
+                We will get back to you with more details via email within the
+                next few minutes
+              </p>
+              <button onClick={handleCloseCart} className="button">
+                Okay
+              </button>
+            </div>
+          ) : (
+            <Form openSuccess={finishForm} />
+          )}
+        </Modal>
+      );
+    } else {
+      modal = (
         <Modal className="cart-total">
           <div>
             <h3>Your Cart</h3>
@@ -63,10 +79,20 @@ export default function Control() {
             <button onClick={closeCart} className="button">
               Close
             </button>
+            <button onClick={handleCheckout} className="button">
+              Go to Checkout
+            </button>
           </div>
         </Modal>
-      ) : null}
+      );
+    }
+  } else {
+    null;
+  }
 
+  return (
+    <>
+      {modal}
       <div id="main-header">
         <Header />
         <button onClick={openCart} className="button">

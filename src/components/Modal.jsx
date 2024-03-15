@@ -13,7 +13,7 @@ export default function Modal({children}) {
     } else {
       dialog.current.close();
     }
-  }, [open]);
+  }, [isCartOpen]);
 
   return createPortal(
     <dialog className="modal" ref={dialog} onClose={closeCart}>

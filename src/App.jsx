@@ -1,6 +1,6 @@
+import {useState} from "react";
 import Control from "./components/Control";
 import MealContextProvider from "./store/meal-order-context";
-
 
 // export const INITIAL_STATE = {
 //   selectedMeals: [],
@@ -9,9 +9,10 @@ import MealContextProvider from "./store/meal-order-context";
 // };
 
 function App() {
+  const [totalPrice, setTotalPrice] = useState();
   return (
     <MealContextProvider>
-      <Control />
+      <Control totalPrice={totalPrice} />
     </MealContextProvider>
   );
 }
